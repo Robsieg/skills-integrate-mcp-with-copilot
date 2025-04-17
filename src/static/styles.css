@@ -12,14 +12,36 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: white; /* Updated to school color */
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, limegreen, white);
+  opacity: 0.1;
+  z-index: -1;
+  animation: branch-lines 10s linear infinite;
+}
+
+@keyframes branch-lines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
 }
 
 header {
   text-align: center;
   padding: 20px 0;
   margin-bottom: 30px;
-  background-color: #1a237e;
+  background-color: limegreen; /* Updated to school color */
   color: white;
   border-radius: 5px;
 }
@@ -150,7 +172,7 @@ section h3 {
 }
 
 button {
-  background-color: #1a237e;
+  background-color: limegreen; /* Updated to school color */
   color: white;
   border: none;
   padding: 10px 15px;
@@ -161,7 +183,8 @@ button {
 }
 
 button:hover {
-  background-color: #3949ab;
+  background-color: white; /* Updated hover effect */
+  color: limegreen; /* Added hover text color */
 }
 
 .message {
