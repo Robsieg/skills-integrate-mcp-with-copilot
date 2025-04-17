@@ -12,28 +12,17 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  background-color: white; /* Updated to school color */
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: linear-gradient(to right, limegreen, white);
-  opacity: 0.1;
-  z-index: -1;
+  background-size: 200% 200%;
   animation: branch-lines 10s linear infinite;
 }
 
 @keyframes branch-lines {
   0% {
-    background-position: 0 0;
+    background-position: 0% 50%;
   }
   100% {
-    background-position: 100% 100%;
+    background-position: 100% 50%;
   }
 }
 
