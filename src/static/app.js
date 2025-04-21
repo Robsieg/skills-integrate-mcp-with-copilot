@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryFilter = document.getElementById("category-filter");
   const sortOptions = document.getElementById("sort-options");
 
+  // Add Activity button and modal elements
+  const addActivityButton = document.getElementById("add-activity-button");
+  const addActivityModal = document.getElementById("add-activity-modal");
+  const addActivityForm = document.getElementById("add-activity-form");
+
   // Function to filter and sort activities
   function filterAndSortActivities(activities) {
     const searchQuery = searchBar.value.toLowerCase();
@@ -206,6 +211,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
   }
 
+  // Toggle Add Activity modal
+  function toggleAddActivityModal() {
+    addActivityModal.style.display = addActivityModal.style.display === "block" ? "none" : "block";
+  }
+
   // Display a brief message for invalid login
   function showTemporaryMessage(message, duration = 3000) {
     const loginError = document.getElementById('login-error');
@@ -237,8 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok) {
         alert(result.message);
         toggleLoginModal();
-        // Store login status in localStorage
         localStorage.setItem('isTeacherLoggedIn', 'true');
+        location.reload(); // Reload the page
       } else {
         showTemporaryMessage(result.message); // Show invalid login message briefly
         passwordField.value = ''; // Clear the password field
@@ -254,11 +264,16 @@ document.addEventListener("DOMContentLoaded", () => {
       userIcon.addEventListener('click', toggleLoginModal);
   }
 
-  // Ensure the close button in the login modal properly closes the modal
-  const closeModalButton = document.querySelector('.modal .close');
-  if (closeModalButton) {
-      closeModalButton.addEventListener('click', toggleLoginModal);
-  }
+  // Ensure the close button in any modal properly closes the respective modal
+  const closeModalButtons = document.querySelectorAll('.modal .close');
+  closeModalButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+          const modal = event.target.closest('.modal');
+          if (modal) {
+              modal.style.display = 'none';
+          }
+      });
+  });
 
   // Toggle login mode between login and logout
   const loginButton = document.getElementById('login-button');
@@ -275,19 +290,56 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Add a logout button functionality
-  //const logoutButton = document.getElementById('logout-button');
-  //if (logoutButton) {
-  //    logoutButton.addEventListener('click', () => {
-  //        localStorage.setItem('isTeacherLoggedIn', 'false'); // Set login status to false
-  //        alert('You have been logged out.');
-  //        restrictActions(); // Update UI based on login status
-  //    });
-  // }
+  // Handle Add Activity form submission
+  addActivityForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("activity-name").value;
+    const description = document.getElementById("activity-description").value;
+    const startTime = document.getElementById("activity-start-time").value;
+    const endTime = document.getElementById("activity-end-time").value;
+    const category = document.getElementById("activity-category").value;
+    const maxParticipants = document.getElementById("activity-max-participants").value;
+
+    try {
+      const response = await fetch("/activities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          description,
+          start_time: startTime,
+          end_time: endTime,
+          category,
+          max_participants: parseInt(maxParticipants, 10),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message);
+        toggleAddActivityModal();
+        fetchActivities(); // Refresh activities list
+      } else {
+        alert(result.detail || "Failed to add activity.");
+      }
+    } catch (error) {
+      console.error("Error adding activity:", error);
+      alert("An error occurred. Please try again.");
+    }
+  });
+
+  // Attach event listener to Add Activity button
+  addActivityButton.addEventListener("click", () => {
+    toggleAddActivityModal();
+    populateCategoryDropdown();
+  });
 
   // Updated restrictActions to ensure delete buttons are properly hidden
   function restrictActions() {
-    const isTeacherLoggedIn = localStorage.getItem('isTeacherLoggedIn') === 'false';
+    const isTeacherLoggedIn = localStorage.getItem("isTeacherLoggedIn") === "true";
+    addActivityButton.style.display = isTeacherLoggedIn ? "inline-block" : "none";
 
     // Select all restricted buttons (e.g., delete buttons)
     const restrictedButtons = document.querySelectorAll('.delete-btn');
@@ -305,6 +357,75 @@ document.addEventListener("DOMContentLoaded", () => {
   // Call restrictActions on page load and after login/logout
   window.onload = restrictActions;
 
+  // Function to populate category dropdown
+  async function populateCategoryDropdown() {
+    try {
+      const response = await fetch('/activities');
+      const activities = await response.json();
+
+      const categories = new Set();
+      Object.values(activities).forEach(activity => {
+        if (activity.category) {
+          categories.add(activity.category);
+        }
+      });
+
+      const categoryDropdown = document.getElementById('activity-category');
+      categoryDropdown.innerHTML = '<option value="">-- Select a category --</option>';
+
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryDropdown.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error fetching activities for categories:', error);
+    }
+  }
+
   // Initialize app
   fetchActivities();
+
+  // Update Add Activity form layout to include start and end time fields
+  addActivityForm.innerHTML = `
+    <label for="activity-name">Name:</label>
+    <input type="text" id="activity-name" name="activity-name" required>
+
+    <label for="activity-description">Description:</label>
+    <textarea id="activity-description" name="activity-description" required></textarea>
+
+    <label for="activity-start-time">Start Time:</label>
+    <input type="text" id="activity-start-time" name="activity-start-time" required>
+
+    <label for="activity-end-time">End Time:</label>
+    <input type="text" id="activity-end-time" name="activity-end-time" required>
+
+    <label for="activity-category">Category:</label>
+    <select id="activity-category" name="activity-category" required>
+      <option value="">-- Select a category --</option>
+    </select>
+
+    <label for="activity-max-participants">Max Participants:</label>
+    <input type="number" id="activity-max-participants" name="activity-max-participants" required>
+
+    <button type="submit">Add Activity</button>
+  `;
+
+  // Initialize Flatpickr for the start and end time input fields
+  flatpickr("#activity-start-time", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+  });
+
+  flatpickr("#activity-end-time", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+  });
+
+  addActivityForm.style.display = "flex";
+  addActivityForm.style.flexDirection = "column";
+  addActivityForm.style.gap = "15px";
 });

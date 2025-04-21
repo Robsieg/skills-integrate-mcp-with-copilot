@@ -107,6 +107,34 @@ def unregister_student(data: UnregisterRequest):
     activity["participants"].remove(data.email)
     return {"message": f"Student {data.email} unregistered successfully from {data.activity_name}", "status": "success"}
 
+class AddActivityRequest(BaseModel):
+    name: str
+    description: str
+    schedule: str
+    category: str
+    max_participants: int
+
+@app.post("/activities")
+def add_activity(data: AddActivityRequest):
+    """Add a new activity to the activities.json file"""
+    if data.name in activities:
+        raise HTTPException(status_code=400, detail="Activity already exists")
+
+    # Add the new activity
+    activities[data.name] = {
+        "description": data.description,
+        "schedule": data.schedule,
+        "category": data.category,
+        "max_participants": data.max_participants,
+        "participants": []
+    }
+
+    # Save the updated activities to the JSON file
+    with open(activities_file, "w") as f:
+        json.dump(activities, f, indent=4)
+
+    return {"message": f"Activity '{data.name}' added successfully"}
+
 @app.get("/")
 def root():
     return RedirectResponse(url="/static/index.html")
