@@ -4,17 +4,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
+  // Toolbar elements
+  const searchBar = document.getElementById("search-bar");
+  const categoryFilter = document.getElementById("category-filter");
+  const sortOptions = document.getElementById("sort-options");
+
+  // Function to filter and sort activities
+  function filterAndSortActivities(activities) {
+    const searchQuery = searchBar.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+    const sortBy = sortOptions.value;
+
+    let filteredActivities = Object.entries(activities).filter(([name, details]) => {
+      const matchesSearch = name.toLowerCase().includes(searchQuery) || details.description.toLowerCase().includes(searchQuery);
+      const matchesCategory = !selectedCategory || details.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+
+    if (sortBy === "name") {
+      filteredActivities.sort(([nameA], [nameB]) => nameA.localeCompare(nameB));
+    } else if (sortBy === "schedule") {
+      filteredActivities.sort(([, detailsA], [, detailsB]) => detailsA.schedule.localeCompare(detailsB.schedule));
+    }
+
+    return Object.fromEntries(filteredActivities);
+  }
+
+  // Update activities list on filter/sort change
+  function updateActivitiesDisplay() {
+    fetchActivities();
+  }
+
+  searchBar.addEventListener("input", updateActivitiesDisplay);
+  categoryFilter.addEventListener("change", updateActivitiesDisplay);
+  sortOptions.addEventListener("change", updateActivitiesDisplay);
+
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
       const response = await fetch("/activities");
       const activities = await response.json();
 
+      const filteredAndSortedActivities = filterAndSortActivities(activities);
+
       // Clear loading message
       activitiesList.innerHTML = "";
 
       // Populate activities list
-      Object.entries(activities).forEach(([name, details]) => {
+      Object.entries(filteredAndSortedActivities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
