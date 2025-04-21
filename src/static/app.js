@@ -290,6 +290,31 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // Update Add Activity form layout to include start and end time fields
+  addActivityForm.innerHTML = `
+    <label for="activity-name">Name:</label>
+    <input type="text" id="activity-name" name="activity-name" required>
+
+    <label for="activity-description">Description:</label>
+    <textarea id="activity-description" name="activity-description" required></textarea>
+
+    <label for="activity-start-time">Start Time:</label>
+    <input type="text" id="activity-start-time" name="activity-start-time" required>
+
+    <label for="activity-end-time">End Time:</label>
+    <input type="text" id="activity-end-time" name="activity-end-time" required>
+
+    <label for="activity-category">Category:</label>
+    <select id="activity-category" name="activity-category" required>
+      <option value="">-- Select a category --</option>
+    </select>
+
+    <label for="activity-max-participants">Max Participants:</label>
+    <input type="number" id="activity-max-participants" name="activity-max-participants" required>
+
+    <button type="submit">Add Activity</button>
+  `;
+
   // Handle Add Activity form submission
   addActivityForm.addEventListener("submit", async (event) => {
     event.preventDefault();
