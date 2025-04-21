@@ -15,14 +15,7 @@
 
     <main>
       <section id="activities-container">
-        <h3>Available Activities</h3>
-        <div id="activities-list">
-          <!-- Activities will be loaded here -->
-          <p>Loading activities...</p>
-        </div>
-      </section>
-
-      <section id="signup-container">
+        
         <h3>Sign Up for an Activity</h3>
         <form id="signup-form">
           <div class="form-group">
@@ -39,11 +32,31 @@
           <button type="submit">Sign Up</button>
         </form>
         <div id="message" class="hidden"></div>
+        <h3>Available Activities</h3>
+        <div id="toolbar">
+          <input type="text" id="search-bar" placeholder="Search activities..." />
+          <select id="category-filter">
+            <option value="">All Categories</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Education">Education</option>
+            <option value="Sports">Sports</option>
+            <option value="Arts">Arts</option>
+            <option value="Public Speaking">Public Speaking</option>
+          </select>
+          <select id="sort-options">
+            <option value="name">Sort by Name</option>
+            <option value="schedule">Sort by Schedule</option>
+          </select>
+        </div>
+        <div id="activities-list">
+          <!-- Activities will be loaded here -->
+          <p>Loading activities...</p>
+        </div>
       </section>
     </main>
 
     <footer>
-      <p>&copy; 2023 Mergington High School</p>
+      <p>&copy; 2025 Mergington High School</p>
     </footer>
 
     <script src="app.js"></script>
