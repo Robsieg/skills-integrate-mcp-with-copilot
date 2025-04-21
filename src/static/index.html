@@ -12,7 +12,6 @@
       <h2>Extracurricular Activities</h2>
       <img src="https://octodex.github.com/images/oktobercat.png" alt="Oktobercat" style="width: 200px; height: auto;" />
     </header>
-
     <main>
       <section id="activities-container">
         
@@ -30,6 +29,7 @@
             </select>
           </div>
           <button type="submit">Sign Up</button>
+          <button id="login-button" type="button" style="margin-left: 10px;">Login-Logout</button>
         </form>
         <div id="message" class="hidden"></div>
         <h3>Available Activities</h3>
@@ -54,6 +54,23 @@
         </div>
       </section>
     </main>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleLoginModal()">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p id="login-error" class="error-message"></p>
+        </div>
+    </div>
 
     <footer>
       <p>&copy; 2025 Mergington High School</p>
